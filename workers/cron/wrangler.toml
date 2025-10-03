@@ -7,10 +7,9 @@ compatibility_date = "2024-10-01"
 crons = ["*/30 * * * *"]
 
 # KV namespace for currency rate caching
-# Replace with the SAME ID as in root wrangler.toml
 [[kv_namespaces]]
 binding = "CURRENCY_RATES"
-id = "REPLACE_WITH_KV_ID"
+id = "210997d0fd1c4f56b15d6639682ecb09"
 
 # Environment variables
 [vars]
