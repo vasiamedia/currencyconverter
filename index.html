@@ -1,4 +1,4 @@
-<!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Thu Oct 02 2025 20:41:18 GMT+0000 (Coordinated Universal Time)  -->
+<!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Fri Oct 03 2025 20:35:43 GMT+0000 (Coordinated Universal Time)  -->
 <html data-wf-page="68de120ee925e0bd632fa0df" data-wf-site="68de120ce925e0bd632fa085">
 <head>
   <meta charset="utf-8">
@@ -313,17 +313,31 @@ margin: 0rem !important;
                   <div class="margin-top margin-medium">
                     <div class="form-block w-form">
                       <form id="email-form" name="email-form" data-name="Email Form" method="get" class="form" data-wf-page-id="68de120ee925e0bd632fa0df" data-wf-element-id="a65cf90c-13b2-a111-db22-f589c058920a">
-                        <div class="div-block"><input class="text-field w-input" maxlength="256" name="field" data-name="Field" placeholder="Example Text" type="text" id="field" required=""><select id="field-2" name="field-2" data-name="Field 2" class="select-field w-select">
+                        <div class="div-block"><input class="text-field w-input" maxlength="256" name="field" data-name="Field" placeholder="Example Text" type="text" id="amount" required=""><select id="from" name="field-2" data-name="Field 2" class="select-field w-select">
                             <option value="GBP">GBP</option>
                             <option value="EUR">EUR</option>
                             <option value="USD">USD</option>
-                          </select><select id="field-2" name="field-2" data-name="Field 2" class="select-field w-select">
+                          </select><select id="to" name="field-2" data-name="Field 2" class="select-field w-select">
                             <option value="EUR">EUR</option>
                             <option value="GBP">GBP</option>
                             <option value="USD">USD</option>
                           </select></div>
                         <div class="div-block-2">
-                          <a href="#" class="w-button">Convert</a>
+                          <a id="button" href="#" class="w-button">Convert</a>
+                        </div>
+                        <div class="hide w-embed w-script">
+                          <script>
+document.getElementById("button").addEventListener("click", function() {
+  const from = document.getElementById("from").value.toLowerCase();
+  const to = document.getElementById("to").value.toLowerCase();
+  const amount = document.getElementById("amount").value.trim();
+  let path = `/${from}-to-${to}`;
+  if (amount && amount !== "1") {
+    path += `/${amount}`;
+  }
+  window.location.href = path;
+});
+</script>
                         </div>
                       </form>
                       <div class="w-form-done">
