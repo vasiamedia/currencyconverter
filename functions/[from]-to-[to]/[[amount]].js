@@ -136,12 +136,14 @@ export async function onRequest(context) {
           element.setInnerContent(pageTitle);
         }
       })
-      // Add/update meta description
+      // Add/update meta description and inject exchange rate
       .on('head', {
         element(element) {
           element.append(`<meta name="description" content="${metaDescription}">`, { html: true });
           element.append(`<meta property="og:title" content="${pageTitle}">`, { html: true });
           element.append(`<meta property="og:description" content="${metaDescription}">`, { html: true });
+          // Store the exchange rate for client-side amount updates
+          element.append(`<script>window.__RATE__=${rate};window.__FROM__="${fromCurrency}";window.__TO__="${toCurrency}";</script>`, { html: true });
         }
       })
       // Set the amount input value
@@ -200,26 +202,65 @@ export async function onRequest(context) {
         element(element) {
           element.setInnerContent(`
             <script>
-              // Update the conversion button behavior
-              const form = document.getElementById("email-form");
-              const button = document.createElement("a");
-              button.id = "button";
-              button.href = "#";
-              button.className = "w-button";
-              button.textContent = "Convert";
-              document.querySelector(".div-block-2").prepend(button);
-              
-              button.addEventListener("click", function(e) {
-                e.preventDefault();
-                const from = document.getElementById("from").value.toLowerCase();
-                const to = document.getElementById("to").value.toLowerCase();
-                const amount = document.getElementById("amount").value.trim();
-                let path = \`/\${from}-to-\${to}\`;
-                if (amount && amount !== "1") {
-                  path += \`/\${amount}\`;
+              (function() {
+                const amountEl = document.getElementById("amount");
+                const fromEl = document.getElementById("from");
+                const toEl = document.getElementById("to");
+                const convEl = document.getElementById("conversion");
+                
+                // Format number with commas
+                function formatNum(n) {
+                  return parseFloat(n).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  });
                 }
-                window.location.href = path;
-              });
+                
+                // Parse amount, default to 1
+                function parseAmount(val) {
+                  const n = parseFloat(String(val || '1').replace(/,/g, ''));
+                  return (Number.isFinite(n) && n > 0) ? n : 1;
+                }
+                
+                // Update conversion display and URL for amount changes only
+                function updateAmount() {
+                  const amt = parseAmount(amountEl.value);
+                  const rate = window.__RATE__ || 1;
+                  const from = window.__FROM__ || fromEl.value.toUpperCase();
+                  const to = window.__TO__ || toEl.value.toUpperCase();
+                  
+                  // Update displayed conversion
+                  const converted = amt * rate;
+                  convEl.textContent = formatNum(converted);
+                  
+                  // Update URL without reload
+                  const slugAmt = amt === 1 ? '' : '/' + amt;
+                  const path = \`/\${from.toLowerCase()}-to-\${to.toLowerCase()}\${slugAmt}\`;
+                  history.replaceState({}, '', path);
+                }
+                
+                // Currency change → reload with new URL
+                function handleCurrencyChange() {
+                  const from = fromEl.value.toLowerCase();
+                  const to = toEl.value.toLowerCase();
+                  const amt = parseAmount(amountEl.value);
+                  const slugAmt = amt === 1 ? '' : '/' + amt;
+                  window.location.href = \`/\${from}-to-\${to}\${slugAmt}\`;
+                }
+                
+                // Amount blur → update display + URL only
+                amountEl.addEventListener("blur", updateAmount);
+                amountEl.addEventListener("keydown", function(e) {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    updateAmount();
+                  }
+                });
+                
+                // Currency change → reload
+                fromEl.addEventListener("change", handleCurrencyChange);
+                toEl.addEventListener("change", handleCurrencyChange);
+              })();
             </script>
           `, { html: true });
         }
