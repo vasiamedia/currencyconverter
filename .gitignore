@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+
+# Wrangler
+.wrangler
+.dev.vars
+dist
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temp files
+*.log
+*.tmp
+test
+
