@@ -182,22 +182,10 @@ export async function onRequest(context) {
           }
         }
       })
-      // Replace {{CONVERSION}} with actual conversion result
+      // Replace {{CONVERSION}} with just the converted amount
       .on('#conversion', {
         element(element) {
-          element.setInnerContent(`
-            <div style="text-align: center;">
-              <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
-                ${conversionText}
-              </div>
-              <div style="font-size: 1rem; color: #666;">
-                ${rateText}
-              </div>
-              <div style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
-                Last updated: ${new Date(usdRatesData.timestamp).toLocaleString()}
-              </div>
-            </div>
-          `, { html: true });
+          element.setInnerContent(formattedConverted);
         }
       })
       // Update the Convert button to recalculate on click
