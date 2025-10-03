@@ -1,0 +1,26 @@
+name = "currencyconverter-cron"
+main = "src/index.ts"
+compatibility_date = "2024-10-01"
+
+# Run every 30 minutes
+[triggers]
+crons = ["*/30 * * * *"]
+
+# KV namespace for currency rate caching
+# Replace with the SAME ID as in root wrangler.toml
+[[kv_namespaces]]
+binding = "CURRENCY_RATES"
+id = "REPLACE_WITH_KV_ID"
+
+# D1 database for historical rate storage
+# Replace with the SAME ID as in root wrangler.toml
+[[d1_databases]]
+binding = "DB"
+database_name = "currencyconverter"
+database_id = "REPLACE_WITH_D1_ID"
+
+# Environment variables
+[vars]
+# Comma-separated list of base currencies to fetch
+RATES_BASES = "USD,EUR,GBP,JPY,AUD,CAD,CHF,CNY,INR,MXN"
+

@@ -1,0 +1,17 @@
+{
+  "name": "currencyconverter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Currency converter powered by Cloudflare Pages + Workers",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy:pages": "wrangler pages deploy .",
+    "deploy:cron": "wrangler deploy workers/cron",
+    "d1:migrate": "wrangler d1 migrations apply currencyconverter",
+    "d1:migrate:local": "wrangler d1 migrations apply currencyconverter --local"
+  },
+  "devDependencies": {
+    "wrangler": "^3.77.0"
+  }
+}
+
