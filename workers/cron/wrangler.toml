@@ -9,7 +9,7 @@ crons = ["*/30 * * * *"]
 # KV namespace for currency rate caching
 [[kv_namespaces]]
 binding = "CURRENCY_RATES"
-id = "210997d0fd1c4f56b15d6639682ecb09"
+id = "a323de077aa54d53b572ac835bf77aa4"
 
 # Environment variables
 [vars]

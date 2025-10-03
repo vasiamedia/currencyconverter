@@ -21,17 +21,15 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // Get data from KV
-    const kvKey = `rates:${base}`;
+    // Get data from KV - try both key formats
+    const kvKey = `${base.toLowerCase()}-rates`; // e.g., "usd-rates"
     const kvData = await env.CURRENCY_RATES.get(kvKey, { type: "json" });
     
     if (kvData) {
       return Response.json({
         success: true,
         base,
-        rates: kvData.rates,
-        timestamp: kvData.at,
-        source: kvData.source || "exchangerate.host"
+        ...kvData  // Spread the entire KV data
       }, {
         headers: {
           "Cache-Control": "public, max-age=300", // 5 min browser cache
