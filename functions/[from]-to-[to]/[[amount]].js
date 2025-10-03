@@ -96,6 +96,40 @@ export async function onRequest(context) {
     
     // Use HTMLRewriter to modify the template
     const rewriter = new HTMLRewriter()
+      // Fix all relative src and href paths to be absolute
+      .on('link[href]', {
+        element(element) {
+          const href = element.getAttribute('href');
+          if (href && !href.startsWith('http') && !href.startsWith('/') && !href.startsWith('#')) {
+            element.setAttribute('href', '/' + href);
+          }
+        }
+      })
+      .on('script[src]', {
+        element(element) {
+          const src = element.getAttribute('src');
+          if (src && !src.startsWith('http') && !src.startsWith('/')) {
+            element.setAttribute('src', '/' + src);
+          }
+        }
+      })
+      .on('img[src]', {
+        element(element) {
+          const src = element.getAttribute('src');
+          if (src && !src.startsWith('http') && !src.startsWith('/') && !src.startsWith('data:')) {
+            element.setAttribute('src', '/' + src);
+          }
+        }
+      })
+      .on('a[href]', {
+        element(element) {
+          const href = element.getAttribute('href');
+          // Only fix relative paths, not # anchors, external links, or already absolute paths
+          if (href && !href.startsWith('http') && !href.startsWith('/') && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+            element.setAttribute('href', '/' + href);
+          }
+        }
+      })
       // Update page title
       .on('title', {
         element(element) {
