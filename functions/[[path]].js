@@ -44,13 +44,15 @@ export async function onRequest(context) {
   //   });
   // response = rewriter.transform(response);
 
-  // Clone and add cache headers
+  // Clone and add cache headers - no cache to ensure fresh rates on every page load
   response = new Response(response.body, response);
-  response.headers.set("Cache-Control", "public, max-age=600, s-maxage=3600");
+  response.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Expires", "0");
   response.headers.set("X-Cache-Status", "MISS");
   
-  // Store in edge cache
-  context.waitUntil(cache.put(cacheKey, response.clone()));
+  // Don't store in edge cache - we want fresh KV data every time
+  // context.waitUntil(cache.put(cacheKey, response.clone()));
   
   return response;
 }

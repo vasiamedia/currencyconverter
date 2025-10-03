@@ -55,7 +55,9 @@ export async function onRequestGet(context) {
     return new Response(rate.toString(), {
       headers: {
         "Content-Type": "text/plain",
-        "Cache-Control": "public, max-age=300",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
         "Access-Control-Allow-Origin": "*"
       }
     });

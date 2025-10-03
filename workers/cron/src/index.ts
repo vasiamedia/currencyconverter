@@ -129,10 +129,10 @@ async function updateBase(base: string, env: Env, timestamp: string): Promise<vo
     kvKey,
     JSON.stringify(kvValue),
     {
-      expirationTtl: 60 * 60 * 6 // 6 hours
+      expirationTtl: 60 * 10 // 10 minutes (safety buffer for 1-min updates)
     }
   );
   
-  console.log(`Stored ${base} rates in KV with 6hr TTL`);
+  console.log(`Stored ${base} rates in KV with 10min TTL`);
 }
 

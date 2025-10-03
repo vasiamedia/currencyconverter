@@ -32,9 +32,14 @@ export async function onRequest(context) {
   }
   
   try {
-    // Fetch the template.html file
+    // Fetch the template.html file (with edge caching for the static HTML)
     const templateUrl = new URL('/template.html', request.url);
-    const templateResponse = await fetch(templateUrl.toString());
+    const templateResponse = await fetch(templateUrl.toString(), {
+      cf: {
+        cacheTtl: 3600, // Cache static template for 1 hour at edge
+        cacheEverything: true
+      }
+    });
     
     if (!templateResponse.ok) {
       return new Response("Template not found", { status: 404 });
@@ -264,9 +269,11 @@ export async function onRequest(context) {
     // Transform the response
     const transformedResponse = rewriter.transform(templateResponse);
     
-    // Add caching headers
+    // Add caching headers - no cache to ensure fresh rates on every page load
     const response = new Response(transformedResponse.body, transformedResponse);
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
     response.headers.set('Content-Type', 'text/html; charset=utf-8');
     
     return response;

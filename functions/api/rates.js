@@ -32,7 +32,9 @@ export async function onRequestGet(context) {
         ...kvData  // Spread the entire KV data
       }, {
         headers: {
-          "Cache-Control": "public, max-age=300", // 5 min browser cache
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*"
         }
