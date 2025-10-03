@@ -190,23 +190,18 @@ export async function onRequest(context) {
           element.setInnerContent(formattedConverted);
         }
       })
-      // Update the Convert button to recalculate on click
-      .on('a#button', {
+      // Add dynamic conversion script at end of body
+      .on('body', {
         element(element) {
-          // Remove the button, replace with a script that handles conversion
-          element.remove();
-        }
-      })
-      // Add dynamic conversion script
-      .on('.hide.w-embed.w-script', {
-        element(element) {
-          element.setInnerContent(`
+          element.append(`
             <script>
               (function() {
                 const amountEl = document.getElementById("amount");
                 const fromEl = document.getElementById("from");
                 const toEl = document.getElementById("to");
                 const convEl = document.getElementById("conversion");
+                
+                if (!amountEl || !fromEl || !toEl || !convEl) return;
                 
                 // Format number with commas
                 function formatNum(n) {
