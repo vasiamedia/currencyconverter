@@ -40,18 +40,36 @@ export async function onRequest(context) {
       return new Response("Template not found", { status: 404 });
     }
     
-    // Get exchange rates from KV
-    const kvKey = `${fromCurrency.toLowerCase()}-rates`;
-    const ratesData = await env.CURRENCY_RATES.get(kvKey, { type: "json" });
+    // Get USD rates from KV (we use USD as the base for all conversions)
+    const usdRatesData = await env.CURRENCY_RATES.get('usd-rates', { type: "json" });
     
-    if (!ratesData || !ratesData.rates) {
-      return new Response(`Rates not available for ${fromCurrency}`, { status: 404 });
+    if (!usdRatesData || !usdRatesData.rates) {
+      return new Response('Exchange rates not available', { status: 503 });
     }
     
-    // Calculate conversion
-    const rate = ratesData.rates[toCurrency];
+    // Calculate conversion rate using cross-rate formula: USD/TO ÷ USD/FROM
+    let rate;
+    
+    if (fromCurrency === 'USD') {
+      // Direct conversion from USD
+      rate = usdRatesData.rates[toCurrency];
+    } else if (toCurrency === 'USD') {
+      // Inverse conversion to USD
+      rate = 1 / usdRatesData.rates[fromCurrency];
+    } else {
+      // Cross-rate: (USD/TO) ÷ (USD/FROM)
+      const usdToTarget = usdRatesData.rates[toCurrency];
+      const usdToSource = usdRatesData.rates[fromCurrency];
+      
+      if (!usdToTarget || !usdToSource) {
+        return new Response(`Currency not found: ${!usdToTarget ? toCurrency : fromCurrency}`, { status: 404 });
+      }
+      
+      rate = usdToTarget / usdToSource;
+    }
+    
     if (!rate) {
-      return new Response(`No rate found for ${fromCurrency} to ${toCurrency}`, { status: 404 });
+      return new Response(`Unable to calculate rate for ${fromCurrency} to ${toCurrency}`, { status: 404 });
     }
     
     const convertedAmount = (amount * rate).toFixed(2);
@@ -142,7 +160,7 @@ export async function onRequest(context) {
                 ${rateText}
               </div>
               <div style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
-                Last updated: ${new Date(ratesData.timestamp).toLocaleString()}
+                Last updated: ${new Date(usdRatesData.timestamp).toLocaleString()}
               </div>
             </div>
           `, { html: true });
