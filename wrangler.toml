@@ -8,13 +8,6 @@ compatibility_date = "2024-10-01"
 binding = "CURRENCY_RATES"
 id = "REPLACE_WITH_KV_ID"
 
-# D1 database for historical rate storage
-# Replace with actual ID after creating: npx wrangler d1 create currencyconverter
-[[d1_databases]]
-binding = "DB"
-database_name = "currencyconverter"
-database_id = "REPLACE_WITH_D1_ID"
-
 # Environment variables
 [vars]
 SITE_ORIGIN = "https://currencyconverter.org"

@@ -12,13 +12,6 @@ crons = ["*/30 * * * *"]
 binding = "CURRENCY_RATES"
 id = "REPLACE_WITH_KV_ID"
 
-# D1 database for historical rate storage
-# Replace with the SAME ID as in root wrangler.toml
-[[d1_databases]]
-binding = "DB"
-database_name = "currencyconverter"
-database_id = "REPLACE_WITH_D1_ID"
-
 # Environment variables
 [vars]
 # Comma-separated list of base currencies to fetch

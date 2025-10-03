@@ -2,14 +2,11 @@
  * Cloudflare Worker - Cron Job
  * 
  * Runs every 30 minutes to fetch fresh currency exchange rates.
- * Stores data in:
- * - KV (fast cache with 6hr TTL)
- * - D1 (permanent historical storage)
+ * Stores data in KV (fast cache with 6hr TTL)
  */
 
 export interface Env {
   CURRENCY_RATES: KVNamespace;
-  DB: D1Database;
   RATES_BASES?: string;
 }
 
@@ -89,7 +86,7 @@ export default {
 };
 
 /**
- * Fetch rates for a single base currency and store in KV + D1
+ * Fetch rates for a single base currency and store in KV
  */
 async function updateBase(base: string, env: Env, timestamp: string): Promise<void> {
   console.log(`Fetching rates for ${base}...`);
@@ -137,18 +134,5 @@ async function updateBase(base: string, env: Env, timestamp: string): Promise<vo
   );
   
   console.log(`Stored ${base} rates in KV with 6hr TTL`);
-  
-  // Store in D1 (permanent historical data)
-  const stmt = env.DB.prepare(
-    "INSERT INTO rates (base, quote, rate, source, fetched_at) VALUES (?1, ?2, ?3, ?4, ?5)"
-  );
-  
-  const batch = Object.entries(data.rates).map(([quote, rate]) =>
-    stmt.bind(base, quote, rate, "exchangerate.host", timestamp)
-  );
-  
-  await env.DB.batch(batch);
-  
-  console.log(`Stored ${batch.length} rates in D1 for ${base}`);
 }
 
